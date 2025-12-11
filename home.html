@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СПА Салон - Главная</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Главная страница - современный дизайн */
+        .home-page {
+            background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
+            min-height: 100vh;
+        }
+        
+        .home-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 24px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .home-header .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        
+        .home-header .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        
+        .home-header .nav-links a {
+            color: #666666;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .home-header .nav-links a:hover {
+            color: #1a1a1a;
+        }
+        
+        .home-header .btn-login {
+            padding: 10px 24px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .home-header .btn-login:hover {
+            background: #2a2a2a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Hero секция */
+        .hero-section {
+            padding: 100px 48px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .hero-section h1 {
+            font-size: 56px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+            letter-spacing: -1.5px;
+            line-height: 1.2;
+        }
+        
+        .hero-section .subtitle {
+            font-size: 20px;
+            color: #666666;
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-hero {
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+        }
+        
+        .btn-hero-primary {
+            background: #1a1a1a;
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .btn-hero-primary:hover {
+            background: #2a2a2a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-hero-secondary {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-hero-secondary:hover {
+            border-color: #1a1a1a;
+            background: #f8f8f8;
+            transform: translateY(-2px);
+        }
+        
+        /* Секция услуг */
+        .services-section {
+            padding: 80px 48px;
+            background: #ffffff;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #666666;
+            margin-bottom: 64px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .service-card {
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .service-card:hover {
+            border-color: #d0d0d0;
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: #f8f8f8;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover .service-icon {
+            background: #1a1a1a;
+            transform: scale(1.1);
+        }
+        
+        .service-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        
+        .service-card p {
+            color: #666666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        /* Преимущества */
+        .benefits-section {
+            padding: 80px 48px;
+            background: #f8f8f8;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .benefit-item {
+            text-align: center;
+        }
+        
+        .benefit-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        
+        .benefit-label {
+            font-size: 16px;
+            color: #666666;
+            font-weight: 500;
+        }
+        
+        /* Секция отзывов */
+        .reviews-section {
+            padding: 80px 48px;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .reviews-carousel-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .reviews-carousel {
+            position: relative;
+            width: 100%;
+        }
+        
+        .reviews-grid {
+            display: flex;
+            gap: 32px;
+            transition: transform 0.5s ease;
+            will-change: transform;
+        }
+        
+        .review-card {
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            width: calc((100% - 64px) / 3);
+            flex-shrink: 0;
+        }
+        
+        .review-card:hover {
+            border-color: #d0d0d0;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        }
+        
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+        }
+        
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+        
+        .carousel-dot.active {
+            background: #1a1a1a;
+            width: 24px;
+            border-radius: 5px;
+        }
+        
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .review-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .review-info {
+            flex: 1;
+        }
+        
+        .review-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .review-specialist {
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .review-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .star {
+            color: #ffc107;
+            font-size: 18px;
+        }
+        
+        .star.empty {
+            color: #e0e0e0;
+        }
+        
+        .review-text {
+            color: #666666;
+            font-size: 15px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .review-stats {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 13px;
+            color: #999999;
+        }
+        
+        .reviews-loading {
+            text-align: center;
+            padding: 40px;
+            color: #666666;
+        }
+        
+        .reviews-empty {
+            text-align: center;
+            padding: 40px;
+            color: #999999;
+        }
+        
+        /* CTA секция */
+        .cta-section {
+            background: #1a1a1a;
+            padding: 80px 48px;
+            text-align: center;
+            color: #ffffff;
+        }
+        
+        .cta-section h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        
+        .cta-section p {
+            font-size: 18px;
+            color: #cccccc;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn-cta {
+            padding: 16px 36px;
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cta:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.2);
+        }
+        
+        /* Футер */
+        .home-footer {
+            background: #ffffff;
+            border-top: 1px solid #e8e8e8;
+            padding: 40px 48px;
+            text-align: center;
+            color: #666666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 36px;
+            }
+            
+            .hero-section .subtitle {
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .review-card {
+                min-width: 100%;
+            }
+            
+            .reviews-carousel-wrapper {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body class="home-page">
+    <div class="home-header">
+        <div class="logo">✨ СПА Салон</div>
+        <div class="nav-links">
+            <a href="#services">Услуги</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="login.html" class="btn-login">Войти</a>
+        </div>
+    </div>
+    
+    <div class="hero-section">
+        <h1>Забота о вашем здоровье и красоте</h1>
+        <p class="subtitle">Профессиональные услуги массажа, косметологии и ухода за телом. Запишитесь онлайн в удобное для вас время.</p>
+        <div class="hero-buttons">
+            <a href="client.html" class="btn-hero btn-hero-primary">Записаться онлайн</a>
+            <a href="login.html" class="btn-hero btn-hero-secondary">Войти в систему</a>
+        </div>
+    </div>
+    
+    <div class="services-section" id="services">
+        <h2 class="section-title">Наши услуги</h2>
+        <p class="section-subtitle">Широкий спектр процедур для вашего здоровья и красоты</p>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">💆</div>
+                <h3>Массаж</h3>
+                <p>Классический и спортивный массаж от опытных специалистов. Расслабление, восстановление и улучшение самочувствия.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">✨</div>
+                <h3>Косметология</h3>
+                <p>Современные процедуры по уходу за лицом и телом. Поддержание красоты и молодости с использованием качественных средств.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">💅</div>
+                <h3>Маникюр и педикюр</h3>
+                <p>Профессиональный уход за ногтями и кожей рук и ног. Комфортная обстановка и внимание к деталям.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🧖</div>
+                <h3>СПА-процедуры</h3>
+                <p>Комплексные программы для полного расслабления и восстановления. Уникальные процедуры для тела и души.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌸</div>
+                <h3>Уход за лицом</h3>
+                <p>Омолаживающие и увлажняющие процедуры для лица. Индивидуальный подход к каждому клиенту.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌿</div>
+                <h3>Ароматерапия</h3>
+                <p>Расслабляющие сеансы с использованием натуральных эфирных масел. Гармония тела и разума.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="benefits-section" id="about">
+        <h2 class="section-title">Почему выбирают нас</h2>
+        <p class="section-subtitle">Мы заботимся о каждом клиенте</p>
+        <div class="benefits-grid">
+            <div class="benefit-item">
+                <div class="benefit-number">5+</div>
+                <div class="benefit-label">Лет опыта</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-number">1000+</div>
+                <div class="benefit-label">Довольных клиентов</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-number">15+</div>
+                <div class="benefit-label">Профессиональных мастеров</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-number">50+</div>
+                <div class="benefit-label">Видов процедур</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="reviews-section" id="reviews">
+        <h2 class="section-title">Отзывы наших клиентов</h2>
+        <p class="section-subtitle">Что говорят о нас довольные клиенты</p>
+        <div class="reviews-carousel-wrapper">
+            <div id="reviews-container" class="reviews-carousel">
+                <div class="reviews-loading">Загрузка отзывов...</div>
+            </div>
+            <div id="carousel-dots" class="carousel-controls"></div>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h2>Готовы начать?</h2>
+        <p>Выберите удобное время и запишитесь на процедуру прямо сейчас. Мы поможем вам расслабиться и восстановить силы.</p>
+        <a href="client.html" class="btn-cta">Записаться сейчас</a>
+    </div>
+    
+    <div class="home-footer">
+        <p>© 2025 СПА Салон. Все права защищены.</p>
+    </div>
+    
+    <script>
+        let currentReviewIndex = 0;
+        let reviewsData = [];
+        let autoSlideInterval = null;
+        
+        // Загрузка реальных отзывов
+        async function loadReviews() {
+            const container = document.getElementById('reviews-container');
+            const dotsContainer = document.getElementById('carousel-dots');
+            
+            try {
+                const response = await fetch('/api/reviews');
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных');
+                }
+                
+                const reviews = await response.json();
+                
+                if (!Array.isArray(reviews) || reviews.length === 0) {
+                    container.innerHTML = '<div class="reviews-empty">Пока нет отзывов. Будьте первым!</div>';
+                    return;
+                }
+                
+                // Убираем дубликаты по ID
+                const uniqueReviews = [];
+                const seenIds = new Set();
+                reviews.forEach(review => {
+                    if (!seenIds.has(review.id)) {
+                        seenIds.add(review.id);
+                        uniqueReviews.push(review);
+                    }
+                });
+                
+                reviewsData = uniqueReviews;
+                
+                if (reviewsData.length === 0) {
+                    container.innerHTML = '<div class="reviews-empty">Пока нет отзывов. Будьте первым!</div>';
+                    return;
+                }
+                
+                // Очищаем контейнер и создаем сетку
+                container.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = 'reviews-grid';
+                container.appendChild(grid);
+                
+                grid.innerHTML = reviewsData.map(review => {
+                    // Получаем первую букву имени клиента для аватара
+                    const clientName = review.clientName || 'Клиент';
+                    const initial = clientName.charAt(0).toUpperCase();
+                    
+                    // Генерируем звезды
+                    const stars = Array.from({length: 5}, (_, i) => 
+                        i < review.rating ? '<span class="star">★</span>' : '<span class="star empty">★</span>'
+                    ).join('');
+                    
+                    // Форматируем дату
+                    const date = review.date || '';
+                    const formattedDate = date ? new Date(date + 'T00:00:00').toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }) : '';
+                    
+                    // Текст отзыва или заглушка
+                    const reviewText = review.text && review.text.trim() 
+                        ? review.text 
+                        : 'Отличный мастер, рекомендую!';
+                    
+                    return `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">${initial}</div>
+                                <div class="review-info">
+                                    <div class="review-name">${clientName}</div>
+                                    <div class="review-specialist">${review.specialistName || ''} • ${review.specialization || ''}</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                ${stars}
+                            </div>
+                            <div class="review-text">
+                                "${reviewText}"
+                            </div>
+                            <div class="review-stats">
+                                ${formattedDate}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Создаем точки для навигации
+                const totalSlides = Math.ceil(reviewsData.length / 3);
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('data-slide', i);
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                }
+                
+                // Запускаем автоматическую прокрутку
+                startAutoSlide();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки отзывов:', error);
+                container.innerHTML = '<div class="reviews-empty">Не удалось загрузить отзывы. Попробуйте обновить страницу.</div>';
+            }
+        }
+        
+        function goToSlide(index) {
+            const grid = document.querySelector('.reviews-grid');
+            if (!grid) return;
+            
+            currentReviewIndex = index;
+            const container = document.querySelector('.reviews-carousel-wrapper');
+            const containerWidth = container ? container.offsetWidth : 1200;
+            const cardWidth = containerWidth / 3; // 3 карточки видно одновременно
+            const offset = -index * containerWidth;
+            
+            grid.style.transform = `translateX(${offset}px)`;
+            
+            // Обновляем активную точку
+            document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+        
+        function nextSlide() {
+            const totalSlides = Math.ceil(reviewsData.length / 3);
+            currentReviewIndex = (currentReviewIndex + 1) % totalSlides;
+            goToSlide(currentReviewIndex);
+        }
+        
+        function startAutoSlide() {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+            }
+            autoSlideInterval = setInterval(nextSlide, 4000); // Переключение каждые 4 секунды
+        }
+        
+        // Загружаем отзывы при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            loadReviews();
+            
+            // Останавливаем автопрокрутку при наведении
+            const reviewsSection = document.querySelector('.reviews-section');
+            if (reviewsSection) {
+                reviewsSection.addEventListener('mouseenter', () => {
+                    if (autoSlideInterval) {
+                        clearInterval(autoSlideInterval);
+                    }
+                });
+                reviewsSection.addEventListener('mouseleave', () => {
+                    startAutoSlide();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

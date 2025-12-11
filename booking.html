@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись в СПА Салон</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        
+        .booking-page {
+            max-width: 600px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 48px;
+            border-radius: 12px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        
+        .booking-page h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #212529;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #212529;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #ffffff;
+            color: #212529;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #212529;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #212529;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+        
+        .submit-btn:hover {
+            background: #495057;
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 32px;
+        }
+        
+        .back-link a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .back-link a:hover {
+            color: #212529;
+        }
+        
+        .service-info {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+            border: 1px solid #e9ecef;
+        }
+        
+        .service-info.active {
+            display: block;
+        }
+        
+        .service-info p {
+            margin: 4px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .service-info strong {
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="booking-page">
+        <h1>Запись в СПА Салон</h1>
+        
+        <form id="booking-form">
+            <div class="form-group">
+                <label for="client-name">Ваше имя *</label>
+                <input type="text" id="client-name" required placeholder="Введите ваше имя">
+            </div>
+            
+            <div class="form-group">
+                <label for="client-phone">Телефон *</label>
+                <input type="tel" id="client-phone" required placeholder="+7 (999) 123-45-67">
+            </div>
+            
+            <div class="form-group">
+                <label for="client-email">Email *</label>
+                <input type="email" id="client-email" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="booking-service">Выберите услугу *</label>
+                <select id="booking-service" required onchange="loadServiceInfo()">
+                    <option value="">-- Выберите услугу --</option>
+                </select>
+                <div id="service-info" class="service-info">
+                    <p><strong>Цена:</strong> <span id="service-price">-</span> руб.</p>
+                    <p><strong>Длительность:</strong> <span id="service-duration">-</span> мин.</p>
+                    <p><strong>Описание:</strong> <span id="service-description">-</span></p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="booking-specialist">Выберите мастера *</label>
+                <select id="booking-specialist" required onchange="loadTimeSlotsForBooking()">
+                    <option value="">-- Сначала выберите услугу --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="booking-date">Дата *</label>
+                <input type="date" id="booking-date" required onchange="loadTimeSlotsForBooking()">
+            </div>
+            
+            <div class="form-group">
+                <label for="booking-time">Время *</label>
+                <select id="booking-time" required>
+                    <option value="">-- Сначала выберите мастера и дату --</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="submit-btn">Записаться</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">← Вернуться к панели управления</a>
+        </div>
+    </div>
+    
+    <script src="booking.js"></script>
+</body>
+</html>
