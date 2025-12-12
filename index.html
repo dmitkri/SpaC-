@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СПА Салон - Управление</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="mock-api.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Управление СПА Салоном</h1>
+            <div class="booking-link">
+                <a href="home.html">Главная</a>
+                <a href="client.html" target="_blank" style="margin-left: 12px;">Онлайн запись</a>
+            </div>
+        </div>
+        
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('clients')">Клиенты</button>
+            <button class="tab-btn" onclick="showTab('services')">Услуги</button>
+            <button class="tab-btn" onclick="showTab('specialists')">Мастера</button>
+            <button class="tab-btn" onclick="showTab('specialist-schedule')">Расписание мастеров</button>
+            <button class="tab-btn" onclick="showTab('bookings')">Записи</button>
+            <button class="tab-btn" onclick="showTab('statistics')">Статистика</button>
+            <button class="tab-btn" id="admin-users-btn" onclick="showTab('admin-users')" style="display: none;">Пользователи</button>
+        </div>
+        
+        <!-- Вкладка Клиенты -->
+        <div id="clients-tab" class="tab-content active">
+            <h2>Список клиентов</h2>
+            
+            <div class="form-section">
+                <h3>Добавить нового клиента</h3>
+                <input type="text" id="client-firstname" placeholder="Имя">
+                <input type="text" id="client-lastname" placeholder="Фамилия">
+                <input type="text" id="client-phone" placeholder="Телефон">
+                <input type="text" id="client-email" placeholder="Email">
+                <input type="password" id="client-password" placeholder="Пароль">
+                <button onclick="addClient()">Добавить клиента</button>
+            </div>
+            
+            <div class="list-section">
+                <h3>Все клиенты</h3>
+                <div id="clients-list"></div>
+            </div>
+        </div>
+        
+        <!-- Вкладка Услуги -->
+        <div id="services-tab" class="tab-content">
+            <h2>Список услуг</h2>
+            
+            <div class="form-section">
+                <h3>Добавить новую услугу</h3>
+                <input type="text" id="service-name" placeholder="Название услуги">
+                <input type="number" id="service-price" placeholder="Цена (руб)">
+                <input type="number" id="service-duration" placeholder="Длительность (мин)">
+                <textarea id="service-description" placeholder="Описание услуги" rows="3"></textarea>
+                <button onclick="addService()">Добавить услугу</button>
+            </div>
+            
+            <div class="list-section">
+                <h3>Все услуги</h3>
+                <div id="services-list"></div>
+            </div>
+            
+            <div class="form-section" style="margin-top: 32px;">
+                <h3>Привязать мастера к услуге</h3>
+                <select id="link-service">
+                    <option value="">Выберите услугу</option>
+                </select>
+                <select id="link-specialist">
+                    <option value="">Выберите мастера</option>
+                </select>
+                <button onclick="linkSpecialistToService()">Привязать</button>
+            </div>
+        </div>
+        
+        <!-- Вкладка Записи -->
+        <div id="bookings-tab" class="tab-content">
+            <h2>Записи на услуги</h2>
+            
+            <div class="form-section">
+                <h3>Создать новую запись</h3>
+                <select id="booking-client">
+                    <option value="">Выберите клиента</option>
+                </select>
+                <select id="booking-service" onchange="loadSpecialistsForService()">
+                    <option value="">Выберите услугу</option>
+                </select>
+                <select id="booking-specialist">
+                    <option value="">Выберите мастера</option>
+                </select>
+                <input type="date" id="booking-date" onchange="loadTimeSlots()">
+                <select id="booking-time">
+                    <option value="">Выберите время</option>
+                </select>
+                <textarea id="booking-notes" placeholder="Комментарии (необязательно)" rows="2"></textarea>
+                <button onclick="createBooking()">Создать запись</button>
+            </div>
+            
+            <div class="list-section">
+                <h3>Все записи</h3>
+                <div id="bookings-list"></div>
+            </div>
+        </div>
+        
+        <!-- Вкладка Мастера -->
+        <div id="specialists-tab" class="tab-content">
+            <h2>Список мастеров</h2>
+            
+            <div class="form-section">
+                <h3>Добавить нового мастера</h3>
+                <input type="text" id="specialist-name" placeholder="Имя мастера">
+                <input type="text" id="specialist-specialization-new" placeholder="Специализация">
+                <button onclick="addSpecialist()">Добавить мастера</button>
+            </div>
+            
+            <div class="list-section">
+                <h3>Все мастера</h3>
+                <div id="specialists-list"></div>
+            </div>
+        </div>
+        
+        <!-- Вкладка Расписание мастеров -->
+        <div id="specialist-schedule-tab" class="tab-content">
+            <h2>Управление расписанием мастеров</h2>
+            
+            <div class="form-section">
+                <h3>Выберите мастера</h3>
+                <select id="schedule-specialist" onchange="loadSpecialistSchedule()">
+                    <option value="">-- Выберите мастера --</option>
+                </select>
+            </div>
+            
+            <div id="schedule-editor" style="display: none;">
+                <h3>Рабочие часы</h3>
+                <div class="schedule-days" id="schedule-days"></div>
+                <button onclick="saveSpecialistSchedule()" class="btn btn-primary" style="margin-top: 20px;">Сохранить расписание</button>
+            </div>
+            
+            <div class="list-section" style="margin-top: 40px;">
+                <h3>Календарь мастера</h3>
+                <div id="specialist-calendar"></div>
+            </div>
+        </div>
+        
+        <!-- Вкладка Статистика -->
+        <div id="statistics-tab" class="tab-content">
+            <h2>Статистика</h2>
+            <div id="statistics-content"></div>
+        </div>
+        
+        <!-- Вкладка Управление пользователями (только для суперадмина) -->
+        <div id="admin-users-tab" class="tab-content">
+            <h2>Управление пользователями</h2>
+            <p style="color: #888888; margin-bottom: 24px;">Создание администраторов и мастеров</p>
+            
+            <div class="form-section">
+                <h3>Создать администратора</h3>
+                <input type="text" id="admin-firstname" placeholder="Имя">
+                <input type="text" id="admin-lastname" placeholder="Фамилия">
+                <input type="text" id="admin-phone" placeholder="Телефон">
+                <input type="text" id="admin-email" placeholder="Email">
+                <input type="password" id="admin-password" placeholder="Пароль">
+                <button onclick="createAdmin()">Создать администратора</button>
+            </div>
+            
+            <div class="form-section" style="margin-top: 32px;">
+                <h3>Создать мастера</h3>
+                <input type="text" id="specialist-firstname" placeholder="Имя">
+                <input type="text" id="specialist-lastname" placeholder="Фамилия">
+                <input type="text" id="specialist-phone" placeholder="Телефон">
+                <input type="text" id="specialist-email" placeholder="Email">
+                <input type="text" id="specialist-user-specialization" placeholder="Специализация">
+                <input type="password" id="specialist-password" placeholder="Пароль">
+                <button onclick="createSpecialistUser()">Создать мастера</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+
