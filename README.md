@@ -8,12 +8,15 @@
 
 ### Как опубликовать на GitHub Pages
 
-1. Создайте репозиторий на GitHub
-2. Загрузите все файлы в репозиторий
-3. Перейдите в Settings → Pages
-4. Выберите ветку (обычно `main`) и папку `/ (root)`
-5. Сохраните изменения
-6. Ваш сайт будет доступен по адресу: `https://ваш-username.github.io/название-репозитория/`
+1. Перейдите в настройки репозитория на GitHub: https://github.com/dmitkri/SpaC-/settings/pages
+2. В разделе "Build and deployment":
+   - **Source**: выберите "Deploy from a branch"
+   - **Branch**: выберите `main` и папку `/ (root)`
+3. Нажмите **Save**
+4. Через несколько минут ваш сайт будет доступен по адресу: 
+   `https://dmitkri.github.io/SpaC-/`
+
+**Важно:** Используйте обычный статический хостинг (Deploy from a branch), а не GitHub Actions!
 
 ### Структура файлов
 
