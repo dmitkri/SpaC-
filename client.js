@@ -311,7 +311,6 @@ function renderSpecialists() {
         const card = document.createElement('div');
         card.className = 'specialist-card';
         card.setAttribute('data-specialist-id', specialist.id);
-        card.onclick = () => selectSpecialist(specialist);
         
         if (bookingState.specialistId === specialist.id) {
             card.classList.add('selected');
@@ -325,6 +324,12 @@ function renderSpecialists() {
             <div class="specialist-spec">${specialist.specialization}</div>
         `;
         
+        // Устанавливаем обработчик после innerHTML, чтобы он не был перезаписан
+        card.addEventListener('click', () => {
+            console.log('Мастер выбран:', specialist.name, specialist.id);
+            selectSpecialist(specialist);
+        });
+        
         grid.appendChild(card);
     });
     
@@ -333,23 +338,31 @@ function renderSpecialists() {
 
 // Выбор мастера
 function selectSpecialist(specialist) {
+    console.log('selectSpecialist вызван для мастера:', specialist);
     bookingState.specialistId = specialist.id;
     bookingState.specialist = specialist;
-    // Не перерендериваем всех мастеров, просто обновляем выделение
+    
+    // Обновляем выделение всех карточек
     document.querySelectorAll('.specialist-card').forEach(card => {
         card.classList.remove('selected');
         const cardId = card.getAttribute('data-specialist-id');
         if (cardId && parseInt(cardId) === specialist.id) {
             card.classList.add('selected');
+            console.log('Карточка мастера выделена');
         }
     });
+    
     // Активируем кнопку "Далее" на шаге 3 (выбор мастера)
     const btnNext3 = document.getElementById('btn-next-3');
+    console.log('Ищем кнопку btn-next-3:', btnNext3);
     if (btnNext3) {
         btnNext3.disabled = false;
         console.log('Кнопка "Далее" активирована после выбора мастера');
+        // Добавляем визуальную обратную связь
+        btnNext3.style.opacity = '1';
+        btnNext3.style.cursor = 'pointer';
     } else {
-        console.error('Кнопка btn-next-3 не найдена!');
+        console.error('Кнопка btn-next-3 не найдена! Проверьте HTML структуру.');
     }
 }
 
