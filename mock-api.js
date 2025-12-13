@@ -266,6 +266,8 @@
             // POST /api/auth/login
             } else if (path === '/api/auth/login' && method === 'POST') {
                 const data = JSON.parse(options.body || '{}');
+                // Убеждаемся, что администратор существует перед проверкой логина
+                initStorage();
                 const clients = getClients();
                 const client = clients.find(c => c.email === data.email && c.password === data.password);
                 if (client) {
