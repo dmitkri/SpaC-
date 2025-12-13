@@ -343,9 +343,13 @@ function selectSpecialist(specialist) {
             card.classList.add('selected');
         }
     });
-    const btnNext4 = document.getElementById('btn-next-4');
-    if (btnNext4) {
-        btnNext4.disabled = false;
+    // Активируем кнопку "Далее" на шаге 3 (выбор мастера)
+    const btnNext3 = document.getElementById('btn-next-3');
+    if (btnNext3) {
+        btnNext3.disabled = false;
+        console.log('Кнопка "Далее" активирована после выбора мастера');
+    } else {
+        console.error('Кнопка btn-next-3 не найдена!');
     }
 }
 
