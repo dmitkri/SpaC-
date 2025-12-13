@@ -6,6 +6,7 @@
     <title>СПА Салон - Управление</title>
     <link rel="stylesheet" href="style.css">
     <script src="mock-api.js"></script>
+    <script src="sync-jsonbin.js"></script>
 </head>
 <body>
     <div class="container">
@@ -26,6 +27,7 @@
             <button class="tab-btn" onclick="showTab('bookings')">Записи</button>
             <button class="tab-btn" onclick="showTab('statistics')">Статистика</button>
             <button class="tab-btn" id="admin-users-btn" onclick="showTab('admin-users')" style="display: none;">Пользователи</button>
+            <button class="tab-btn" onclick="window.location.href='sync-settings.html'">Синхронизация</button>
         </div>
         
         <!-- Вкладка Клиенты -->
