@@ -6,13 +6,48 @@
 
     // Инициализация данных в localStorage
     function initStorage() {
+        // Инициализируем остальные хранилища
+        if (!localStorage.getItem('spa_services')) {
+            localStorage.setItem('spa_services', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_specialists')) {
+            localStorage.setItem('spa_specialists', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_bookings')) {
+            localStorage.setItem('spa_bookings', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_payments')) {
+            localStorage.setItem('spa_payments', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_reviews')) {
+            localStorage.setItem('spa_reviews', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_service_specialist_links')) {
+            localStorage.setItem('spa_service_specialist_links', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('spa_specialist_schedules')) {
+            localStorage.setItem('spa_specialist_schedules', JSON.stringify({}));
+        }
+        
+        // Инициализация клиентов и администратора
         let clients = JSON.parse(localStorage.getItem('spa_clients') || '[]');
         // Проверяем, есть ли администратор. Если нет - создаем
-        const hasAdmin = clients.some(c => c.email === 'admin@spa.ru' || c.role === 'superadmin' || c.role === 'admin');
+        const hasAdmin = clients.length > 0 && clients.some(c => 
+            (c.email === 'admin@spa.ru') || 
+            (c.role === 'superadmin') || 
+            (c.role === 'admin')
+        );
+        
         if (!hasAdmin) {
-            // Создаем первого администратора по умолчанию
+            // Определяем следующий ID
+            let nextId = 1;
+            if (clients.length > 0) {
+                nextId = Math.max(...clients.map(c => c.id || 0)) + 1;
+            }
+            
+            // Создаем администратора по умолчанию
             const defaultAdmin = {
-                id: clients.length > 0 ? Math.max(...clients.map(c => c.id)) + 1 : 1,
+                id: nextId,
                 firstName: 'Админ',
                 lastName: 'Админов',
                 phone: '+79000000000',
@@ -21,24 +56,16 @@
                 role: 'superadmin',
                 bonusPoints: 0
             };
+            
             clients.push(defaultAdmin);
             localStorage.setItem('spa_clients', JSON.stringify(clients));
-            const nextId = Math.max(...clients.map(c => c.id)) + 1;
-            localStorage.setItem('spa_next_client_id', nextId.toString());
-        } else if (!localStorage.getItem('spa_clients')) {
-            // Если массива вообще нет - создаем с администратором
-            const defaultAdmin = {
-                id: 1,
-                firstName: 'Админ',
-                lastName: 'Админов',
-                phone: '+79000000000',
-                email: 'admin@spa.ru',
-                password: 'admin123',
-                role: 'superadmin',
-                bonusPoints: 0
-            };
-            localStorage.setItem('spa_clients', JSON.stringify([defaultAdmin]));
-            localStorage.setItem('spa_next_client_id', '2');
+            localStorage.setItem('spa_next_client_id', (nextId + 1).toString());
+        }
+        
+        // Убеждаемся, что есть spa_next_client_id
+        if (!localStorage.getItem('spa_next_client_id')) {
+            const maxId = clients.length > 0 ? Math.max(...clients.map(c => c.id || 0)) : 0;
+            localStorage.setItem('spa_next_client_id', (maxId + 1).toString());
         }
         if (!localStorage.getItem('spa_services')) {
             localStorage.setItem('spa_services', JSON.stringify([]));
