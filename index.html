@@ -135,10 +135,22 @@
                 </select>
             </div>
             
-            <div id="schedule-editor" style="display: none;">
-                <h3>Рабочие часы</h3>
+            <div id="schedule-editor" style="display: none; margin-top: 32px;">
+                <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 600; color: #1a1a1a;">Рабочие часы</h3>
                 <div class="schedule-days" id="schedule-days"></div>
-                <button onclick="saveSpecialistSchedule()" class="btn btn-primary" style="margin-top: 20px;">Сохранить расписание</button>
+                <button onclick="saveSpecialistSchedule()" class="btn btn-primary" style="
+                    margin-top: 32px;
+                    padding: 14px 32px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border-radius: 10px;
+                    background: #007bff;
+                    border: none;
+                    color: white;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+                " onmouseover="this.style.background='#0056b3'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,123,255,0.4)'" onmouseout="this.style.background='#007bff'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,123,255,0.3)'">Сохранить расписание</button>
             </div>
             
             <div class="list-section" style="margin-top: 40px;">

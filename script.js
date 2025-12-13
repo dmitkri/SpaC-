@@ -1382,7 +1382,13 @@ async function renderScheduleEditor(specialist) {
     
     // Создаем контейнер с улучшенным дизайном
     const scheduleWrapper = document.createElement('div');
-    scheduleWrapper.style.cssText = 'background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+    scheduleWrapper.style.cssText = `
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border: 1px solid #e8e8e8;
+    `;
     
     days.forEach(day => {
         const daySchedule = schedule[day.key] || { start: '09:00', end: '18:00', enabled: true };
@@ -1394,17 +1400,18 @@ async function renderScheduleEditor(specialist) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            padding: 16px;
-            background: ${isEnabled ? '#f8f9fa' : '#ffffff'};
-            border: 2px solid ${isEnabled ? '#e0e0e0' : '#f0f0f0'};
-            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px 24px;
+            background: ${isEnabled ? '#f8f9fa' : '#fafafa'};
+            border: 2px solid ${isEnabled ? '#d0d0d0' : '#e8e8e8'};
+            border-radius: 12px;
             transition: all 0.3s ease;
+            box-shadow: ${isEnabled ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'};
         `;
         
         dayDiv.innerHTML = `
             <div style="display: flex; align-items: center; flex: 1;">
-                <div style="width: 140px; font-weight: 600; color: #1a1a1a; font-size: 15px;">${day.name}</div>
+                <div style="width: 150px; font-weight: 600; color: #1a1a1a; font-size: 16px; letter-spacing: -0.2px;">${day.name}</div>
                 <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
                     <div style="position: relative;">
                         <input 
