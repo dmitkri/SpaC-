@@ -7,7 +7,19 @@
     // Инициализация данных в localStorage
     function initStorage() {
         if (!localStorage.getItem('spa_clients')) {
-            localStorage.setItem('spa_clients', JSON.stringify([]));
+            // Создаем первого администратора по умолчанию
+            const defaultAdmin = {
+                id: 1,
+                firstName: 'Админ',
+                lastName: 'Админов',
+                phone: '+79000000000',
+                email: 'admin@spa.ru',
+                password: 'admin123',
+                role: 'superadmin',
+                bonusPoints: 0
+            };
+            localStorage.setItem('spa_clients', JSON.stringify([defaultAdmin]));
+            localStorage.setItem('spa_next_client_id', '2');
         }
         if (!localStorage.getItem('spa_services')) {
             localStorage.setItem('spa_services', JSON.stringify([]));
