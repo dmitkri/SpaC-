@@ -603,20 +603,22 @@
                         let bonusPointsEarned = 0;
                         let bonusPointsSpent = 0;
                         
-                        // Начисление баллов
-                        if (bonusAction === 'earn') {
-                            bonusPointsEarned = bonusPoints > 0 ? bonusPoints : Math.floor(finalAmount * 0.01);
-                        } else if (bonusAction === 'none' || !bonusAction) {
-                            // По умолчанию начисляем 1% от финальной суммы
-                            bonusPointsEarned = Math.floor(finalAmount * 0.01);
-                        }
-                        
-                        // Списание баллов
+                        // Списание баллов (если выбрано)
                         if (bonusAction === 'spend' && bonusPoints > 0) {
                             // Проверяем, что у клиента достаточно баллов
                             const availablePoints = client.bonusPoints || 0;
                             // Списываем не больше, чем есть у клиента и не больше финальной суммы
                             bonusPointsSpent = Math.min(bonusPoints, availablePoints, Math.floor(finalAmount));
+                        }
+                        
+                        // Начисление баллов (всегда, кроме случая когда явно отключено)
+                        // Начисляем 1% от финальной суммы, если не выбрано действие "earn" с конкретным количеством
+                        if (bonusAction === 'earn' && bonusPoints > 0) {
+                            // Если выбрано "earn" с указанным количеством - начисляем указанное
+                            bonusPointsEarned = bonusPoints;
+                        } else {
+                            // По умолчанию начисляем 1% от финальной суммы (даже при списании)
+                            bonusPointsEarned = Math.floor(finalAmount * 0.01);
                         }
                         
                         // Обновляем бонусные баллы клиента

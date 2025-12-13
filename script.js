@@ -1294,19 +1294,30 @@ async function processPayment(bookingId) {
         
         console.log('Ответ сервера:', response.status, response.statusText);
         
-        if (response.ok) {
-            const result = await response.json();
-            console.log('Результат:', result);
-            if (result.success) {
-                showMessage('Запись завершена и оплачена!', 'success');
-                closePaymentModal();
-                loadBookings();
-                loadClients(); // Обновляем клиентов для обновления бонусных баллов
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Результат:', result);
+                if (result.success) {
+                    let message = 'Запись завершена и оплачена!';
+                    if (result.bonusPointsEarned > 0 || result.bonusPointsSpent > 0) {
+                        message += '\n';
+                        if (result.bonusPointsSpent > 0) {
+                            message += `Списано баллов: ${result.bonusPointsSpent}. `;
+                        }
+                        if (result.bonusPointsEarned > 0) {
+                            message += `Начислено баллов: ${result.bonusPointsEarned}. `;
+                        }
+                        message += `Новый баланс: ${result.newBonusPoints} баллов.`;
+                    }
+                    showMessage(message, 'success');
+                    closePaymentModal();
+                    loadBookings();
+                    loadClients(); // Обновляем клиентов для обновления бонусных баллов
+                } else {
+                    showMessage('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
+                    console.error('Ошибка сервера:', result.error);
+                }
             } else {
-                showMessage('Ошибка: ' + (result.error || 'Неизвестная ошибка'), 'error');
-                console.error('Ошибка сервера:', result.error);
-            }
-        } else {
             const error = await response.json().catch(() => ({ error: 'HTTP ' + response.status }));
             showMessage('Ошибка: ' + (error.error || 'Не удалось обработать оплату'), 'error');
             console.error('Ошибка HTTP:', error);
