@@ -195,25 +195,35 @@ async function loadSpecialistsForDate(date) {
         // Фильтруем по рабочим дням - проверяем расписание каждого мастера
         const availableSpecialists = [];
         for (const specialist of filteredSpecialists) {
+            let isAvailable = true; // По умолчанию мастер доступен
+            
             try {
                 const scheduleResponse = await fetch(`${API_URL}/api/specialists/${specialist.id}/schedule`);
                 if (scheduleResponse.ok) {
                     const schedule = await scheduleResponse.json();
-                    const dayOfWeek = new Date(date).getDay();
-                    const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][dayOfWeek];
-                    const workHours = schedule[dayName] || { enabled: true };
                     
-                    // Если день рабочий (enabled !== false и есть время начала)
-                    if (workHours.enabled !== false && (workHours.start || workHours.enabled === undefined)) {
-                        availableSpecialists.push(specialist);
+                    // Если расписание пустое или не задано - мастер доступен (по умолчанию)
+                    if (schedule && Object.keys(schedule).length > 0) {
+                        const dayOfWeek = new Date(date).getDay();
+                        const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][dayOfWeek];
+                        const workHours = schedule[dayName];
+                        
+                        // Если для этого дня есть настройки расписания
+                        if (workHours) {
+                            // Мастер доступен только если день явно не отключен (enabled !== false)
+                            isAvailable = workHours.enabled !== false;
+                        }
+                        // Если для этого дня нет настроек - мастер доступен (по умолчанию все дни рабочие)
                     }
-                } else {
-                    // Если расписание не загрузилось, считаем что мастер доступен
-                    availableSpecialists.push(specialist);
                 }
+                // Если расписание не загрузилось - мастер доступен (по умолчанию)
             } catch (error) {
                 console.error(`Ошибка проверки расписания мастера ${specialist.id}:`, error);
                 // В случае ошибки считаем мастера доступным
+                isAvailable = true;
+            }
+            
+            if (isAvailable) {
                 availableSpecialists.push(specialist);
             }
         }
