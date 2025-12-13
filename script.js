@@ -1183,9 +1183,19 @@ function calculateTotal() {
     const priceAfterDiscount = basePrice - discountAmount;
     
     // Рассчитываем списание баллов (1 балл = 1 рубль)
+    // НЕ можем списать больше, чем есть у клиента
     let bonusDiscount = 0;
     if (bonusAction === 'spend' && bonusPoints > 0) {
-        bonusDiscount = Math.min(bonusPoints, priceAfterDiscount);
+        const availablePoints = client.bonusPoints || 0;
+        // Списываем минимум из: запрошенных баллов, доступных баллов, цены после скидки
+        const pointsToSpend = Math.min(bonusPoints, availablePoints, priceAfterDiscount);
+        bonusDiscount = pointsToSpend;
+        
+        // Обновляем поле ввода, если пытаемся списать больше, чем есть
+        const bonusInput = document.getElementById('bonus-points');
+        if (bonusInput && bonusPoints > availablePoints) {
+            bonusInput.value = availablePoints;
+        }
     }
     
     const total = Math.max(0, priceAfterDiscount - bonusDiscount);

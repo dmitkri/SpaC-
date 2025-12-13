@@ -572,15 +572,98 @@
             // POST /api/bookings/:id/complete
             } else if (path.match(/^\/api\/bookings\/\d+\/complete$/) && method === 'POST') {
                 const id = parseInt(path.split('/')[3]);
+                const data = JSON.parse(options.body || '{}');
                 const bookings = getBookings();
-                const index = bookings.findIndex(b => b.id === id);
-                if (index !== -1) {
-                    bookings[index].status = 'выполнена';
-                    saveBookings(bookings);
-                    responseData = { success: true };
-                } else {
+                const clients = getClients();
+                const services = getServices();
+                const payments = getPayments();
+                
+                const bookingIndex = bookings.findIndex(b => b.id === id);
+                if (bookingIndex === -1) {
                     status = 404;
                     responseData = { error: 'Booking not found' };
+                } else {
+                    const booking = bookings[bookingIndex];
+                    const client = clients.find(c => c.id === booking.clientId);
+                    const service = services.find(s => s.id === booking.serviceId);
+                    
+                    if (!client || !service) {
+                        status = 404;
+                        responseData = { error: 'Client or service not found' };
+                    } else {
+                        // Обновляем статус записи
+                        bookings[bookingIndex].status = 'выполнена';
+                        saveBookings(bookings);
+                        
+                        // Обрабатываем бонусные баллы
+                        const bonusAction = data.bonusAction || 'none';
+                        const bonusPoints = parseInt(data.bonusPoints) || 0;
+                        const finalAmount = parseFloat(data.finalAmount) || service.price;
+                        
+                        let bonusPointsEarned = 0;
+                        let bonusPointsSpent = 0;
+                        
+                        // Начисление баллов
+                        if (bonusAction === 'earn') {
+                            bonusPointsEarned = bonusPoints > 0 ? bonusPoints : Math.floor(finalAmount * 0.01);
+                        } else if (bonusAction === 'none' || !bonusAction) {
+                            // По умолчанию начисляем 1% от финальной суммы
+                            bonusPointsEarned = Math.floor(finalAmount * 0.01);
+                        }
+                        
+                        // Списание баллов
+                        if (bonusAction === 'spend' && bonusPoints > 0) {
+                            // Проверяем, что у клиента достаточно баллов
+                            const availablePoints = client.bonusPoints || 0;
+                            // Списываем не больше, чем есть у клиента и не больше финальной суммы
+                            bonusPointsSpent = Math.min(bonusPoints, availablePoints, Math.floor(finalAmount));
+                        }
+                        
+                        // Обновляем бонусные баллы клиента
+                        const newBonusPoints = Math.max(0, (client.bonusPoints || 0) + bonusPointsEarned - bonusPointsSpent);
+                        client.bonusPoints = newBonusPoints;
+                        const clientIndex = clients.findIndex(c => c.id === client.id);
+                        if (clientIndex !== -1) {
+                            clients[clientIndex] = client;
+                            saveClients(clients);
+                        }
+                        
+                        // Создаем запись о платеже
+                        const paymentDescription = `Оплата услуги (${data.paymentMethod || 'cash'})`;
+                        let fullDescription = paymentDescription;
+                        if (data.discount && data.discount > 0) {
+                            fullDescription += ` (скидка ${data.discount}%)`;
+                        }
+                        if (bonusPointsSpent > 0) {
+                            fullDescription += ` (списано ${bonusPointsSpent} баллов)`;
+                        }
+                        
+                        // Проверяем, была ли предоплата
+                        const hasPrepayment = payments.some(p => 
+                            p.bookingId === id && p.type === 'предоплата'
+                        );
+                        
+                        if (!hasPrepayment) {
+                            const newPayment = {
+                                id: getNextId('spa_next_payment_id'),
+                                clientId: booking.clientId,
+                                bookingId: id,
+                                type: 'списание',
+                                amount: Math.floor(finalAmount),
+                                date: new Date().toISOString().split('T')[0],
+                                description: fullDescription
+                            };
+                            payments.push(newPayment);
+                            savePayments(payments);
+                        }
+                        
+                        responseData = { 
+                            success: true,
+                            bonusPointsEarned: bonusPointsEarned,
+                            bonusPointsSpent: bonusPointsSpent,
+                            newBonusPoints: newBonusPoints
+                        };
+                    }
                 }
 
             // POST /api/bookings/:id/cancel
