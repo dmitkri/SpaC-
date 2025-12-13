@@ -686,9 +686,33 @@
                 const clients = getClients();
                 const services = getServices();
                 const specialists = getSpecialists();
+                const payments = getPayments();
                 const completed = bookings.filter(b => b.status === 'выполнена').length;
                 const planned = bookings.filter(b => b.status === 'запланирована').length;
                 const cancelled = bookings.filter(b => b.status === 'отменена').length;
+                
+                // Рассчитываем общую выручку из платежей
+                // Суммируем все платежи типа "списание" (исключаем возвраты)
+                let totalRevenue = 0;
+                payments.forEach(payment => {
+                    if (payment.type === 'списание') {
+                        totalRevenue += payment.amount || 0;
+                    } else if (payment.type === 'возврат') {
+                        totalRevenue -= payment.amount || 0;
+                    }
+                });
+                
+                // Если платежей нет, считаем по базовой цене выполненных услуг
+                if (totalRevenue === 0 && completed > 0) {
+                    bookings.forEach(booking => {
+                        if (booking.status === 'выполнена') {
+                            const service = services.find(s => s.id === booking.serviceId);
+                            if (service) {
+                                totalRevenue += service.price || 0;
+                            }
+                        }
+                    });
+                }
                 
                 responseData = {
                     totalClients: clients.length,
@@ -697,7 +721,8 @@
                     totalBookings: bookings.length,
                     completedBookings: completed,
                     plannedBookings: planned,
-                    cancelledBookings: cancelled
+                    cancelledBookings: cancelled,
+                    totalRevenue: totalRevenue
                 };
 
             // GET /api/reviews

@@ -539,7 +539,7 @@ function displayStatistics() {
             <p><strong>Выполнено:</strong> ${statistics.completedBookings}</p>
             <p><strong>Отменено:</strong> ${statistics.cancelledBookings}</p>
             <p><strong>Процент выполнения:</strong> ${completionRate}%</p>
-            <p><strong>Общая выручка:</strong> ${statistics.totalRevenue} руб.</p>
+            <p><strong>Общая выручка:</strong> ${(statistics.totalRevenue || 0).toLocaleString('ru-RU')} руб.</p>
         </div>
     `;
 }
