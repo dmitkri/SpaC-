@@ -177,11 +177,16 @@
         const schedule = schedules[specialistId] || {};
         const dayOfWeek = new Date(date).getDay();
         const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][dayOfWeek];
-        const workHours = schedule[dayName] || { start: '09:00', end: '18:00' };
+        const workHours = schedule[dayName] || { start: '09:00', end: '18:00', enabled: true };
+        
+        // Проверяем, рабочий ли это день
+        if (workHours.enabled === false || (!workHours.start && workHours.enabled !== undefined)) {
+            return []; // Не рабочий день - нет слотов
+        }
         
         const slots = [];
-        const start = parseInt(workHours.start.split(':')[0]);
-        const end = parseInt(workHours.end.split(':')[0]);
+        const start = parseInt((workHours.start || '09:00').split(':')[0]);
+        const end = parseInt((workHours.end || '18:00').split(':')[0]);
         
         // Занятые слоты
         const bookedSlots = bookings
@@ -196,6 +201,22 @@
         }
         
         return slots;
+    }
+    
+    // Проверка, работает ли мастер в указанный день
+    function isSpecialistWorkingDay(specialistId, date) {
+        const schedules = JSON.parse(localStorage.getItem('spa_specialist_schedules') || '{}');
+        const schedule = schedules[specialistId] || {};
+        const dayOfWeek = new Date(date).getDay();
+        const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][dayOfWeek];
+        const workHours = schedule[dayName] || { start: '09:00', end: '18:00', enabled: true };
+        
+        // Если день явно отключен или нет времени начала
+        if (workHours.enabled === false || (!workHours.start && workHours.enabled !== undefined)) {
+            return false;
+        }
+        
+        return true;
     }
 
     // Переопределение fetch для перехвата API запросов

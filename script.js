@@ -1352,7 +1352,7 @@ async function loadSpecialistSchedule() {
 }
 
 // Отображение редактора расписания
-function renderScheduleEditor(specialist) {
+async function renderScheduleEditor(specialist) {
     const editor = document.getElementById('schedule-editor');
     editor.style.display = 'block';
     
@@ -1369,36 +1369,142 @@ function renderScheduleEditor(specialist) {
         { name: 'Воскресенье', key: 'sunday' }
     ];
     
-    // Парсим расписание (формат: monday:09:00-18:00,tuesday:09:00-18:00)
+    // Загружаем расписание из API
     let schedule = {};
-    if (specialist.workSchedule && specialist.workSchedule !== '{}') {
-        const parts = specialist.workSchedule.split(',');
-        parts.forEach(part => {
-            const [day, times] = part.split(':');
-            if (times) {
-                const [start, end] = times.split('-');
-                schedule[day] = { start: start || '09:00', end: end || '18:00' };
-            }
-        });
+    try {
+        const scheduleResponse = await fetch(`${API_URL}/api/specialists/${specialist.id}/schedule`);
+        if (scheduleResponse.ok) {
+            schedule = await scheduleResponse.json();
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки расписания:', error);
     }
     
+    // Создаем контейнер с улучшенным дизайном
+    const scheduleWrapper = document.createElement('div');
+    scheduleWrapper.style.cssText = 'background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+    
     days.forEach(day => {
-        const daySchedule = schedule[day.key] || { start: '09:00', end: '18:00' };
+        const daySchedule = schedule[day.key] || { start: '09:00', end: '18:00', enabled: true };
+        const isEnabled = daySchedule.enabled !== false && (daySchedule.start || daySchedule.enabled === undefined);
         
         const dayDiv = document.createElement('div');
-        dayDiv.style.cssText = 'display: flex; align-items: center; margin-bottom: 16px; padding: 16px; background: #f8f9fa; border-radius: 8px;';
+        dayDiv.className = 'schedule-day-item';
+        dayDiv.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: ${isEnabled ? '#f8f9fa' : '#ffffff'};
+            border: 2px solid ${isEnabled ? '#e0e0e0' : '#f0f0f0'};
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        `;
+        
         dayDiv.innerHTML = `
-            <div style="width: 150px; font-weight: 500;">${day.name}:</div>
-            <input type="time" id="schedule-${day.key}-start" value="${daySchedule.start}" style="margin-right: 12px; padding: 8px; border: 1px solid #dee2e6; border-radius: 6px;">
-            <span style="margin: 0 8px;">—</span>
-            <input type="time" id="schedule-${day.key}-end" value="${daySchedule.end}" style="padding: 8px; border: 1px solid #dee2e6; border-radius: 6px;">
-            <label style="margin-left: 16px; display: flex; align-items: center; cursor: pointer;">
-                <input type="checkbox" id="schedule-${day.key}-enabled" ${daySchedule.start ? 'checked' : ''} style="margin-right: 8px;">
-                <span>Рабочий день</span>
+            <div style="display: flex; align-items: center; flex: 1;">
+                <div style="width: 140px; font-weight: 600; color: #1a1a1a; font-size: 15px;">${day.name}</div>
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <div style="position: relative;">
+                        <input 
+                            type="time" 
+                            id="schedule-${day.key}-start" 
+                            value="${daySchedule.start || '09:00'}" 
+                            ${!isEnabled ? 'disabled' : ''}
+                            style="
+                                padding: 10px 12px;
+                                border: 2px solid ${isEnabled ? '#dee2e6' : '#e9ecef'};
+                                border-radius: 8px;
+                                font-size: 14px;
+                                width: 120px;
+                                background: ${isEnabled ? '#ffffff' : '#f8f9fa'};
+                                cursor: ${isEnabled ? 'pointer' : 'not-allowed'};
+                            "
+                        >
+                    </div>
+                    <span style="color: #666; font-weight: 500; font-size: 16px;">—</span>
+                    <div style="position: relative;">
+                        <input 
+                            type="time" 
+                            id="schedule-${day.key}-end" 
+                            value="${daySchedule.end || '18:00'}" 
+                            ${!isEnabled ? 'disabled' : ''}
+                            style="
+                                padding: 10px 12px;
+                                border: 2px solid ${isEnabled ? '#dee2e6' : '#e9ecef'};
+                                border-radius: 8px;
+                                font-size: 14px;
+                                width: 120px;
+                                background: ${isEnabled ? '#ffffff' : '#f8f9fa'};
+                                cursor: ${isEnabled ? 'pointer' : 'not-allowed'};
+                            "
+                        >
+                    </div>
+                </div>
+            </div>
+            <label style="
+                margin-left: 24px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                user-select: none;
+                padding: 8px 12px;
+                border-radius: 8px;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">
+                <input 
+                    type="checkbox" 
+                    id="schedule-${day.key}-enabled" 
+                    ${isEnabled ? 'checked' : ''} 
+                    style="
+                        width: 20px;
+                        height: 20px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                        accent-color: #007bff;
+                    "
+                    onchange="toggleScheduleDay('${day.key}')"
+                >
+                <span style="font-weight: 500; color: #495057; font-size: 14px;">Рабочий день</span>
             </label>
         `;
-        daysContainer.appendChild(dayDiv);
+        scheduleWrapper.appendChild(dayDiv);
     });
+    
+    daysContainer.appendChild(scheduleWrapper);
+}
+
+// Переключение рабочего дня
+function toggleScheduleDay(dayKey) {
+    const enabled = document.getElementById(`schedule-${dayKey}-enabled`).checked;
+    const startInput = document.getElementById(`schedule-${dayKey}-start`);
+    const endInput = document.getElementById(`schedule-${dayKey}-end`);
+    const dayDiv = startInput.closest('.schedule-day-item');
+    
+    if (enabled) {
+        startInput.disabled = false;
+        endInput.disabled = false;
+        dayDiv.style.background = '#f8f9fa';
+        dayDiv.style.borderColor = '#e0e0e0';
+        startInput.style.background = '#ffffff';
+        startInput.style.borderColor = '#dee2e6';
+        startInput.style.cursor = 'pointer';
+        endInput.style.background = '#ffffff';
+        endInput.style.borderColor = '#dee2e6';
+        endInput.style.cursor = 'pointer';
+    } else {
+        startInput.disabled = true;
+        endInput.disabled = true;
+        dayDiv.style.background = '#ffffff';
+        dayDiv.style.borderColor = '#f0f0f0';
+        startInput.style.background = '#f8f9fa';
+        startInput.style.borderColor = '#e9ecef';
+        startInput.style.cursor = 'not-allowed';
+        endInput.style.background = '#f8f9fa';
+        endInput.style.borderColor = '#e9ecef';
+        endInput.style.cursor = 'not-allowed';
+    }
 }
 
 // Сохранение расписания мастера
@@ -1410,18 +1516,19 @@ async function saveSpecialistSchedule() {
     }
     
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const scheduleParts = [];
+    const schedule = {};
     
     days.forEach(day => {
         const enabled = document.getElementById(`schedule-${day}-enabled`).checked;
-        if (enabled) {
-            const start = document.getElementById(`schedule-${day}-start`).value;
-            const end = document.getElementById(`schedule-${day}-end`).value;
-            scheduleParts.push(`${day}:${start}-${end}`);
-        }
+        const start = document.getElementById(`schedule-${day}-start`).value;
+        const end = document.getElementById(`schedule-${day}-end`).value;
+        
+        schedule[day] = {
+            enabled: enabled,
+            start: enabled ? start : null,
+            end: enabled ? end : null
+        };
     });
-    
-    const schedule = scheduleParts.join(',');
     
     try {
         const response = await fetch(`${API_URL}/api/specialists/${specialistId}/schedule`, {
@@ -1429,7 +1536,7 @@ async function saveSpecialistSchedule() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ schedule })
+            body: JSON.stringify(schedule)
         });
         
         if (response.ok) {

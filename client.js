@@ -128,7 +128,7 @@ function selectService(service) {
     loadSpecialistsForService();
 }
 
-// Загрузка мастеров для услуги
+// Загрузка мастеров для услуги (старая функция, оставлена для совместимости)
 async function loadSpecialistsForService() {
     if (!bookingState.serviceId) return;
     
@@ -173,6 +173,86 @@ async function loadSpecialistsForService() {
     } finally {
         loadSpecialistsForService.loading = false;
     }
+}
+
+// Загрузка мастеров для выбранной даты (фильтрация по рабочим дням)
+async function loadSpecialistsForDate(date) {
+    if (!bookingState.serviceId || !date) return;
+    
+    try {
+        const service = services.find(s => s.id === bookingState.serviceId);
+        const allSpecialistsResponse = await fetch(API_URL + '/api/specialists');
+        const allSpecialists = await allSpecialistsResponse.json();
+        
+        // Фильтруем по услуге
+        let filteredSpecialists = [];
+        if (service && service.specialistIds && service.specialistIds.length > 0) {
+            filteredSpecialists = allSpecialists.filter(s => service.specialistIds.includes(s.id));
+        } else {
+            filteredSpecialists = allSpecialists;
+        }
+        
+        // Фильтруем по рабочим дням - проверяем расписание каждого мастера
+        const availableSpecialists = [];
+        for (const specialist of filteredSpecialists) {
+            try {
+                const scheduleResponse = await fetch(`${API_URL}/api/specialists/${specialist.id}/schedule`);
+                if (scheduleResponse.ok) {
+                    const schedule = await scheduleResponse.json();
+                    const dayOfWeek = new Date(date).getDay();
+                    const dayName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][dayOfWeek];
+                    const workHours = schedule[dayName] || { enabled: true };
+                    
+                    // Если день рабочий (enabled !== false и есть время начала)
+                    if (workHours.enabled !== false && (workHours.start || workHours.enabled === undefined)) {
+                        availableSpecialists.push(specialist);
+                    }
+                } else {
+                    // Если расписание не загрузилось, считаем что мастер доступен
+                    availableSpecialists.push(specialist);
+                }
+            } catch (error) {
+                console.error(`Ошибка проверки расписания мастера ${specialist.id}:`, error);
+                // В случае ошибки считаем мастера доступным
+                availableSpecialists.push(specialist);
+            }
+        }
+        
+        // Убираем дубликаты
+        const uniqueSpecialists = [];
+        const seenIds = new Set();
+        availableSpecialists.forEach(specialist => {
+            if (specialist && specialist.id && !seenIds.has(specialist.id)) {
+                seenIds.add(specialist.id);
+                uniqueSpecialists.push(specialist);
+            }
+        });
+        
+        specialists.length = 0;
+        specialists.push(...uniqueSpecialists);
+        
+        // Обновляем подсказку
+        const hint = document.getElementById('specialists-hint');
+        if (hint) {
+            if (uniqueSpecialists.length === 0) {
+                hint.textContent = 'На выбранную дату нет доступных мастеров. Выберите другую дату.';
+                hint.style.color = '#dc3545';
+            } else {
+                hint.textContent = `Доступные мастера на ${formatDateForDisplay(date)}`;
+                hint.style.color = '#666';
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки мастеров для даты:', error);
+        showMessage('Не удалось загрузить мастеров', 'error');
+    }
+}
+
+// Форматирование даты для отображения
+function formatDateForDisplay(dateStr) {
+    const date = new Date(dateStr);
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('ru-RU', options);
 }
 
 // Отображение мастеров
@@ -253,7 +333,10 @@ function selectSpecialist(specialist) {
             card.classList.add('selected');
         }
     });
-    document.getElementById('btn-next-2').disabled = false;
+    const btnNext4 = document.getElementById('btn-next-4');
+    if (btnNext4) {
+        btnNext4.disabled = false;
+    }
 }
 
 // Переход между шагами
@@ -283,21 +366,29 @@ async function goToStep(stepNumber) {
     
     // Загружаем данные для шага
     if (targetStep === 2) {
-        // Загружаем мастеров для выбранной услуги, если еще не загружены
-        if (bookingState.serviceId && specialists.length === 0) {
-            loadSpecialistsForService().then(() => {
-                renderSpecialists();
-            });
-        } else {
-            renderSpecialists();
-        }
-    } else if (targetStep === 3) {
+        // Шаг 2: Выбор даты
         renderCalendar();
-        // Загружаем слоты только если все данные есть
-        if (bookingState.specialistId && bookingState.serviceId) {
-            loadTimeSlots();
+    } else if (targetStep === 3) {
+        // Шаг 3: Выбор мастера (после выбора даты)
+        if (bookingState.date) {
+            await loadSpecialistsForDate(bookingState.date);
+            renderSpecialists();
+        } else {
+            showMessage('Сначала выберите дату', 'error');
+            goToStep(1);
+            return;
         }
     } else if (targetStep === 4) {
+        // Шаг 4: Выбор времени
+        if (bookingState.specialistId && bookingState.serviceId && bookingState.date) {
+            loadTimeSlots();
+        } else {
+            showMessage('Заполните все предыдущие шаги', 'error');
+            goToStep(2);
+            return;
+        }
+    } else if (targetStep === 5) {
+        // Шаг 5: Контактные данные
         renderSummary();
         // Если клиент авторизован, заполняем контактные данные автоматически
         await fillClientDataIfLoggedIn();
@@ -432,7 +523,16 @@ function selectDate(date, element) {
     
     bookingState.date = date;
     element.classList.add('selected');
-    loadTimeSlots();
+    
+    // Активируем кнопку "Далее" для перехода к выбору мастера
+    const btnNext2 = document.getElementById('btn-next-2');
+    if (btnNext2) {
+        btnNext2.disabled = false;
+    }
+    
+    // Сбрасываем выбор мастера при смене даты
+    bookingState.specialistId = null;
+    bookingState.specialist = null;
 }
 
 // Загрузка временных слотов
@@ -508,7 +608,10 @@ function selectTime(time, element) {
     
     bookingState.time = time;
     element.classList.add('selected');
-    document.getElementById('btn-next-3').disabled = false;
+    const btnNext4 = document.getElementById('btn-next-4');
+    if (btnNext4) {
+        btnNext4.disabled = false;
+    }
 }
 
 // Отображение сводки

@@ -537,15 +537,19 @@
             </div>
             <div class="step" data-step="2">
                 <div class="step-number">2</div>
-                <div class="step-title">Мастер</div>
+                <div class="step-title">Дата</div>
             </div>
             <div class="step" data-step="3">
                 <div class="step-number">3</div>
-                <div class="step-title">Дата и время</div>
+                <div class="step-title">Мастер</div>
             </div>
             <div class="step" data-step="4">
                 <div class="step-number">4</div>
-                <div class="step-title">Контактные данные</div>
+                <div class="step-title">Время</div>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-title">Контакты</div>
             </div>
         </div>
         
@@ -560,19 +564,10 @@
                 </div>
             </div>
             
-            <!-- Шаг 2: Выбор мастера -->
+            <!-- Шаг 2: Выбор даты -->
             <div class="step-content" data-content="2">
-                <h2>Выберите мастера</h2>
-                <div class="specialists-grid" id="specialists-grid"></div>
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="goToStep(0)">Назад</button>
-                    <button class="btn btn-primary" onclick="goToStep(2)" id="btn-next-2" disabled>Далее</button>
-                </div>
-            </div>
-            
-            <!-- Шаг 3: Дата и время -->
-            <div class="step-content" data-content="3">
-                <h2>Выберите дату и время</h2>
+                <h2>Выберите дату</h2>
+                <p style="color: #666; margin-bottom: 24px; font-size: 14px;">Выберите удобную дату для записи</p>
                 <div class="calendar-container">
                     <div class="calendar-header">
                         <button class="calendar-nav" onclick="changeMonth(-1)">←</button>
@@ -581,18 +576,39 @@
                     </div>
                     <div class="calendar-grid" id="calendar-grid"></div>
                 </div>
-                <div class="form-section">
-                    <label style="color: #1a1a1a; font-weight: 500; font-size: 14px; display: block; margin-bottom: 16px;">Доступное время</label>
-                    <div class="time-slots" id="time-slots"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="goToStep(0)">Назад</button>
+                    <button class="btn btn-primary" onclick="goToStep(2)" id="btn-next-2" disabled>Далее</button>
                 </div>
+            </div>
+            
+            <!-- Шаг 3: Выбор мастера -->
+            <div class="step-content" data-content="3">
+                <h2>Выберите мастера</h2>
+                <p style="color: #666; margin-bottom: 24px; font-size: 14px;" id="specialists-hint">Доступные мастера на выбранную дату</p>
+                <div class="specialists-grid" id="specialists-grid"></div>
                 <div class="action-buttons">
                     <button class="btn btn-secondary" onclick="goToStep(1)">Назад</button>
                     <button class="btn btn-primary" onclick="goToStep(3)" id="btn-next-3" disabled>Далее</button>
                 </div>
             </div>
             
-            <!-- Шаг 4: Контактные данные -->
+            <!-- Шаг 4: Выбор времени -->
             <div class="step-content" data-content="4">
+                <h2>Выберите время</h2>
+                <p style="color: #666; margin-bottom: 24px; font-size: 14px;">Выберите удобное время для записи</p>
+                <div class="form-section">
+                    <label style="color: #1a1a1a; font-weight: 500; font-size: 14px; display: block; margin-bottom: 16px;">Доступное время</label>
+                    <div class="time-slots" id="time-slots"></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">Назад</button>
+                    <button class="btn btn-primary" onclick="goToStep(4)" id="btn-next-4" disabled>Далее</button>
+                </div>
+            </div>
+            
+            <!-- Шаг 5: Контактные данные -->
+            <div class="step-content" data-content="5">
                 <h2>Ваши контактные данные</h2>
                 <div class="booking-summary" id="booking-summary"></div>
                 <div class="form-section">
