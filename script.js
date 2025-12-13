@@ -1334,20 +1334,30 @@ async function loadSpecialistSchedule() {
         return;
     }
     
+    // Показываем индикатор загрузки
+    const editor = document.getElementById('schedule-editor');
+    const daysContainer = document.getElementById('schedule-days');
+    editor.style.display = 'block';
+    daysContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Загрузка расписания...</p>';
+    
     try {
         // Загружаем мастера
         const response = await fetch(API_URL + '/api/specialists/' + specialistId);
         if (response.ok) {
             const specialist = await response.json();
-            renderScheduleEditor(specialist);
+            console.log('Загружен мастер:', specialist);
+            // Рендерим редактор с актуальным расписанием
+            await renderScheduleEditor(specialist);
             loadSpecialistCalendar(specialistId);
         } else {
             const error = await response.json().catch(() => ({ error: 'Ошибка загрузки мастера' }));
             showMessage('Ошибка: ' + (error.error || 'Не удалось загрузить данные мастера'), 'error');
+            editor.style.display = 'none';
         }
     } catch (error) {
         console.error('Ошибка загрузки расписания:', error);
         showMessage('Ошибка подключения к серверу', 'error');
+        editor.style.display = 'none';
     }
 }
 
@@ -1375,6 +1385,9 @@ async function renderScheduleEditor(specialist) {
         const scheduleResponse = await fetch(`${API_URL}/api/specialists/${specialist.id}/schedule`);
         if (scheduleResponse.ok) {
             schedule = await scheduleResponse.json();
+            console.log('Загружено расписание для мастера', specialist.id, ':', schedule);
+        } else {
+            console.log('Расписание не найдено, используем значения по умолчанию');
         }
     } catch (error) {
         console.error('Ошибка загрузки расписания:', error);
@@ -1391,8 +1404,12 @@ async function renderScheduleEditor(specialist) {
     `;
     
     days.forEach(day => {
-        const daySchedule = schedule[day.key] || { start: '09:00', end: '18:00', enabled: true };
-        const isEnabled = daySchedule.enabled !== false && (daySchedule.start || daySchedule.enabled === undefined);
+        // Получаем расписание для дня из загруженных данных
+        const daySchedule = schedule[day.key];
+        // Если расписание для дня существует, используем его, иначе значения по умолчанию
+        const isEnabled = daySchedule ? (daySchedule.enabled !== false) : true;
+        const startTime = daySchedule && daySchedule.start ? daySchedule.start : '09:00';
+        const endTime = daySchedule && daySchedule.end ? daySchedule.end : '18:00';
         
         const dayDiv = document.createElement('div');
         dayDiv.className = 'schedule-day-item';
@@ -1417,7 +1434,7 @@ async function renderScheduleEditor(specialist) {
                         <input 
                             type="time" 
                             id="schedule-${day.key}-start" 
-                            value="${daySchedule.start || '09:00'}" 
+                            value="${startTime}" 
                             ${!isEnabled ? 'disabled' : ''}
                             style="
                                 padding: 10px 12px;
@@ -1435,7 +1452,7 @@ async function renderScheduleEditor(specialist) {
                         <input 
                             type="time" 
                             id="schedule-${day.key}-end" 
-                            value="${daySchedule.end || '18:00'}" 
+                            value="${endTime}" 
                             ${!isEnabled ? 'disabled' : ''}
                             style="
                                 padding: 10px 12px;
@@ -1480,6 +1497,17 @@ async function renderScheduleEditor(specialist) {
     });
     
     daysContainer.appendChild(scheduleWrapper);
+    
+    // Обновляем статус расписания
+    const scheduleStatus = document.getElementById('schedule-status');
+    if (scheduleStatus) {
+        const workingDays = days.filter(day => {
+            const daySchedule = schedule[day.key];
+            return daySchedule ? (daySchedule.enabled !== false) : true;
+        }).length;
+        scheduleStatus.textContent = `Актуальное расписание: ${workingDays} из ${days.length} дней рабочие`;
+        scheduleStatus.style.color = workingDays > 0 ? '#28a745' : '#dc3545';
+    }
 }
 
 // Переключение рабочего дня

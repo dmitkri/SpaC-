@@ -136,7 +136,10 @@
             </div>
             
             <div id="schedule-editor" style="display: none; margin-top: 32px;">
-                <h3 style="margin-bottom: 24px; font-size: 20px; font-weight: 600; color: #1a1a1a;">Рабочие часы</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1a1a1a;">Рабочие часы</h3>
+                    <span id="schedule-status" style="font-size: 14px; color: #666; font-weight: 500;"></span>
+                </div>
                 <div class="schedule-days" id="schedule-days"></div>
                 <button onclick="saveSpecialistSchedule()" class="btn btn-primary" style="
                     margin-top: 32px;
