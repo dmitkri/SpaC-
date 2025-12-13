@@ -1248,10 +1248,32 @@ async function processPayment(bookingId) {
         return;
     }
     
+    const client = clients.find(c => c.id === booking.clientId);
+    if (!client) {
+        showMessage('Клиент не найден', 'error');
+        return;
+    }
+    
     const basePrice = service.price;
     const discountAmount = (basePrice * discount) / 100;
     const priceAfterDiscount = basePrice - discountAmount;
-    const bonusDiscount = (bonusAction === 'spend' && bonusPoints > 0) ? Math.min(bonusPoints, priceAfterDiscount) : 0;
+    
+    // Рассчитываем списание баллов с учетом доступных баллов у клиента
+    let bonusDiscount = 0;
+    if (bonusAction === 'spend' && bonusPoints > 0) {
+        const availablePoints = client.bonusPoints || 0;
+        // Не можем списать больше, чем есть у клиента
+        bonusDiscount = Math.min(bonusPoints, availablePoints, priceAfterDiscount);
+        
+        // Если пытаемся списать больше, чем есть - предупреждаем
+        if (bonusPoints > availablePoints && availablePoints > 0) {
+            showMessage(`У клиента только ${availablePoints} баллов. Будет списано ${bonusDiscount} баллов.`, 'error');
+        } else if (availablePoints === 0) {
+            showMessage('У клиента нет баллов для списания', 'error');
+            return;
+        }
+    }
+    
     const finalAmount = Math.max(0, priceAfterDiscount - bonusDiscount);
     
     try {
