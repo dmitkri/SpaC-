@@ -743,14 +743,25 @@
                 const id = parseInt(path.split('/')[3]);
                 const data = JSON.parse(options.body || '{}');
                 const reviews = getReviews();
+                
+                // Получаем информацию о клиенте и специалисте для отображения
+                const clients = getClients();
+                const specialists = getSpecialists();
+                const client = clients.find(c => c.id === data.clientId);
+                const specialist = specialists.find(s => s.id === id);
+                
                 const newReview = {
                     id: getNextId('spa_next_review_id'),
                     specialistId: id,
                     clientId: data.clientId,
-                    bookingId: data.bookingId,
+                    bookingId: data.bookingId || 0,
                     rating: data.rating,
-                    comment: data.comment || '',
-                    date: new Date().toISOString().split('T')[0]
+                    text: data.text || data.comment || '', // Поддержка обоих полей для совместимости
+                    comment: data.text || data.comment || '', // Сохраняем и в comment для совместимости
+                    date: new Date().toISOString().split('T')[0],
+                    clientName: client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : 'Клиент',
+                    specialistName: specialist ? `${specialist.firstName || ''} ${specialist.lastName || ''}`.trim() : '',
+                    specialization: specialist ? specialist.specialization || '' : ''
                 };
                 reviews.push(newReview);
                 saveReviews(reviews);
